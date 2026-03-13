@@ -37,3 +37,6 @@ print(app.instance_path)
 # User.query.all() / .first() / .filter_by() / db.session.query(User).get(id)
 
 bcrypt = Bcrypt(app)
+
+app.app_context().push()
+db.create_all()
