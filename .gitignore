@@ -3,6 +3,7 @@
 
 ### Flask ###
 instance/*
+flaskblog/site.db
 !instance/.gitignore
 .webassets-cache
 .env
