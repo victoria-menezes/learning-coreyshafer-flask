@@ -4,26 +4,23 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 
 from dotenv import load_dotenv
 import os
 
 # setting up .env
 load_dotenv()
-app = Flask(__name__,
+app = Flask(
+    __name__,
     template_folder = os.getenv('TEMPLATE_FOLDER')
     ) # __name__ lets flask know where to look for templates, etc
 
-# basedir = os.path.abspath(os.path.dirname(__file__))
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'site.db')
-
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite3' # trying to get this in the .env threw errors, do not recommend
 
 db = SQLAlchemy(app) # also calls db.init_app(app)
-print('Database initialized')
-
-# print(app.instance_path)
+# print('Database initialized')
 
 # database is created via python terminal
 # from flaskblog import app, db
@@ -38,6 +35,3 @@ print('Database initialized')
 # User.query.all() / .first() / .filter_by() / db.session.query(User).get(id)
 
 bcrypt = Bcrypt(app)
-
-app.app_context().push() # not working >_<
-db.create_all() # try moving to routes ??

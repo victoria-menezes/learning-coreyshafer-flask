@@ -71,4 +71,4 @@ class Post(db.Model):
 
 with app.app_context():
     db.create_all()
-    print('Models initialized', db.Model.__subclasses__())
+    # print('Models initialized', db.Model.__subclasses__())
