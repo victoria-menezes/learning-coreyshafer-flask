@@ -22,11 +22,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite3' # trying to get this
 db = SQLAlchemy(app) # also calls db.init_app(app)
 # print('Database initialized')
 
-# database is created via python terminal
-# from flaskblog import app, db
-# app.app_context().push()
-# db.create_all()
-
 # to add users, etc:
 # db.session.add(etc)
 # db.session.commit
@@ -35,3 +30,4 @@ db = SQLAlchemy(app) # also calls db.init_app(app)
 # User.query.all() / .first() / .filter_by() / db.session.query(User).get(id)
 
 bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)

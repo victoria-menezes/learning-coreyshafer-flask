@@ -4,9 +4,15 @@
 # instead we turned out application into a package
 
 from datetime import datetime, timezone
-from flaskblog import db, app
+from flaskblog import db, app, login_manager
 
-class User(db.Model):
+from flask_login import UserMixin
+
+@login_manager.user_loader
+def load_user(user_id : int):
+    return User.query.get(user_id)
+
+class User(db.Model, UserMixin):
     id = db.Column(
         db.Integer,
         primary_key = True # if left blank, will be assigned automatically since its the primary key

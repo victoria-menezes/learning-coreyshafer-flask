@@ -2,6 +2,8 @@ from flask import render_template, flash, redirect, url_for
 from flaskblog import app, db, bcrypt
 from flaskblog.forms import RegistrationForm, LoginForm
 from flaskblog.models import User, Post
+
+from flask_login import login_user, current_user, logout_user
     
 # dummy data
 posts : list[dict] = [
@@ -42,6 +44,9 @@ def about():
            methods=['GET', 'POST'] # accepts get and post requests
            )
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
     form = RegistrationForm()
 
     if form.validate_on_submit(): # if form submitted was valid
@@ -74,15 +79,26 @@ def register():
            methods=['GET', 'POST'] # accepts get and post requests
            )
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     form = LoginForm()
 
     if form.validate_on_submit():
-        if form.email.data == 'admin@blog.com' and form.password.data == 'password': # temporary for testing
-            flash('You have been logged in', 'success')
-            return redirect(url_for('home'))
+        user = User.query.filter_by(email = form.email.data).first()
+        if user and bcrypt.check_password_hash(
+            user.password,
+            form.password.data
+        ):
+            login_user(user, remember = form.remember.data)
+            return redirect(url_for('home'))            
         else:
-            flash('Login failed, please check username and password','danger')
+            flash('Login failed, please check email and password','danger')
     return render_template(
         'login.html',
         title='Login',
         form = form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
