@@ -5,6 +5,9 @@ from flaskblog.models import User, Post
 
 from flask_login import login_user, current_user, logout_user, login_required
     
+import secrets
+import os
+
 # dummy data
 posts : list[dict] = [
     {
@@ -104,6 +107,29 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+
+def save_picture(form_picture):
+
+    # randomize new name for the file
+    random_hex = secrets.token_hex(8)
+    
+    # grab file extension
+    _, f_ext = os.path.splitext(form_picture.filename)
+
+    # final file name
+    picture_fn = random_hex + f_ext
+
+    # full path of where the image will be saved
+    picture_path = os.path.join(
+        app.root_path,
+        'static/profile_pics',
+        picture_fn
+        )
+    
+    form_picture.save(picture_path)
+    
+    return picture_fn
+
 @app.route(
         '/account',
         methods=['GET', 'POST']
@@ -114,6 +140,17 @@ def account():
     # form to update account settings
 
     if form.validate_on_submit():
+        if form.picture.data:
+            # get previous picture for deletion if not default
+            if current_user.image_file != 'default.jpg':
+                previous_picture = os.path.join(app.root_path, 'static/profile_pics', current_user.image_file)
+                if os.path.exists(previous_picture):
+                    os.remove(previous_picture)
+
+            # setting the user's profile picture name
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
+
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
@@ -125,7 +162,7 @@ def account():
         form.username.data = current_user.username
         form.email.data = current_user.email
 
-    image_file = url_for('static', filename = f'profile_pics/{current_user.image_file}')
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template(
         'account.html',
         title='Account',
