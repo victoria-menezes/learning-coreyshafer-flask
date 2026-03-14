@@ -8,6 +8,8 @@ from flask_login import login_user, current_user, logout_user, login_required
 import secrets
 import os
 
+from PIL import Image
+
 # dummy data
 posts : list[dict] = [
     {
@@ -108,8 +110,10 @@ def logout():
     return redirect(url_for('home'))
 
 
-def save_picture(form_picture):
-
+def save_picture(
+    form_picture,
+    output_size : tuple[int, int] = (125, 125)
+    ):
     # randomize new name for the file
     random_hex = secrets.token_hex(8)
     
@@ -126,7 +130,10 @@ def save_picture(form_picture):
         picture_fn
         )
     
-    form_picture.save(picture_path)
+    img = Image.open(form_picture)
+    img.thumbnail(output_size)
+    
+    img.save(picture_path)
     
     return picture_fn
 
