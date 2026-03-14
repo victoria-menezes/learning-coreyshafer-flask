@@ -4,7 +4,7 @@
 # instead we turned out application into a package
 
 from datetime import datetime, timezone
-from flaskblog import db
+from flaskblog import db, app
 
 class User(db.Model):
     id = db.Column(
@@ -67,3 +67,8 @@ class Post(db.Model):
     def __repr__(self) -> str:
         # how its printed with print()
         return f'Post(\'{self.title}\', \'{self.date_posted}\')'
+
+
+with app.app_context():
+    db.create_all()
+    print('Models initialized', db.Model.__subclasses__())

@@ -14,16 +14,17 @@ app = Flask(__name__,
     template_folder = os.getenv('TEMPLATE_FOLDER')
     ) # __name__ lets flask know where to look for templates, etc
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'site.db')
+# basedir = os.path.abspath(os.path.dirname(__file__))
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'site.db')
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite3'
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI') does not work :(
+db = SQLAlchemy(app) # also calls db.init_app(app)
+print('Database initialized')
 
-db = SQLAlchemy(app)
+# print(app.instance_path)
 
-print(app.instance_path)
 # database is created via python terminal
 # from flaskblog import app, db
 # app.app_context().push()
@@ -38,5 +39,5 @@ print(app.instance_path)
 
 bcrypt = Bcrypt(app)
 
-app.app_context().push()
-db.create_all()
+app.app_context().push() # not working >_<
+db.create_all() # try moving to routes ??
