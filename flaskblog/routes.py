@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from flaskblog import app, db, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskblog.models import User, Post
 
 from flask_login import login_user, current_user, logout_user, login_required
@@ -11,26 +11,26 @@ import os
 from PIL import Image
 
 # dummy data
-posts : list[dict] = [
-    {
-        'author':'Corey Schafer',
-        'title':'My first post',
-        'content':'First post ever!',
-        'date_posted':'April 20, 2018'
-    },
-    {
-        'author':'Jane Doe',
-        'title':'Blog post 2',
-        'content':'Hello there...',
-        'date_posted':'April 21, 2018'
-    },
-    {
-        'author':'Jane Doe',
-        'title':'A new post!',
-        'content':'Cool!',
-        'date_posted':'April 22, 2018'
-    }
-]
+# posts : list[dict] = [
+#     {
+#         'author':'Corey Schafer',
+#         'title':'My first post',
+#         'content':'First post ever!',
+#         'date_posted':'April 20, 2018'
+#     },
+#     {
+#         'author':'Jane Doe',
+#         'title':'Blog post 2',
+#         'content':'Hello there...',
+#         'date_posted':'April 21, 2018'
+#     },
+#     {
+#         'author':'Jane Doe',
+#         'title':'A new post!',
+#         'content':'Cool!',
+#         'date_posted':'April 22, 2018'
+#     }
+# ]
 
 # @ = decorator, adds functionality to existing functions
 @app.route('/') # what we type to go to different pages, etc (/posts, /user, etc)
@@ -38,7 +38,7 @@ posts : list[dict] = [
 def home():
     return render_template(
         'home.html',
-        posts = posts
+        posts = Post.query.all()
         )
 
 @app.route('/about')
@@ -174,5 +174,35 @@ def account():
         'account.html',
         title='Account',
         image_file = image_file,
+        form = form
+    )
+
+@app.route(
+        '/post/new',
+        methods=['GET', 'POST']
+        )
+@login_required
+def new_post():
+    form = PostForm()
+
+    if form.validate_on_submit():
+        post = Post(
+            title = form.title.data,
+            content = form.content.data,
+            author = current_user
+        )
+
+        db.session.add(post)
+        db.session.commit()
+        
+        flash('Your post has been created', 'success')
+        return redirect(url_for('home'))
+    
+
+
+
+    return render_template(
+        'post_new.html',
+        title='New Post',
         form = form
     )
