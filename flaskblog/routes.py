@@ -10,35 +10,25 @@ import os
 
 from PIL import Image
 
-# dummy data
-# posts : list[dict] = [
-#     {
-#         'author':'Corey Schafer',
-#         'title':'My first post',
-#         'content':'First post ever!',
-#         'date_posted':'April 20, 2018'
-#     },
-#     {
-#         'author':'Jane Doe',
-#         'title':'Blog post 2',
-#         'content':'Hello there...',
-#         'date_posted':'April 21, 2018'
-#     },
-#     {
-#         'author':'Jane Doe',
-#         'title':'A new post!',
-#         'content':'Cool!',
-#         'date_posted':'April 22, 2018'
-#     }
-# ]
+POSTS_PER_PAGE = 5
 
 # @ = decorator, adds functionality to existing functions
 @app.route('/') # what we type to go to different pages, etc (/posts, /user, etc)
 @app.route('/home') # multiple routes can be used for the same function
 def home():
+    # Pagination
+    page = request.args.get('page', 1, type = int)
+
+    posts = Post.query.\
+        order_by(Post.date_posted.desc()).\
+        paginate(
+            page = page,
+            per_page = POSTS_PER_PAGE
+    ) 
+
     return render_template(
         'home.html',
-        posts = Post.query.all()
+        posts = posts
         )
 
 @app.route('/about')
@@ -272,3 +262,27 @@ def delete_post(post_id : int):
 
     flash('Post deleted.', 'success')
     return redirect(url_for('home'))
+
+@app.route(
+    "/user/<string:username>"
+)
+def user_posts(username):
+    user = User.query.filter_by(username=username).first_or_404()
+
+    # Pagination
+    page = request.args.get('page', 1, type = int)
+
+
+    posts = Post.query.\
+        filter_by(author = user).\
+        order_by(Post.date_posted.desc()).\
+        paginate(
+            page = page,
+            per_page = POSTS_PER_PAGE
+    ) 
+
+    return render_template(
+        'user_posts.html',
+        posts = posts,
+        user = user
+        )

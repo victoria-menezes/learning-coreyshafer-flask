@@ -58,7 +58,7 @@ class Post(db.Model):
     date_posted = db.Column(
         db.DateTime,
         nullable = False,
-        default = datetime.now(timezone.utc)
+        default = lambda : datetime.now(timezone.utc) # if you just pass the function without lambda, it'll stay static for all of the posts made that session
     )
     content = db.Column(
         db.Text,
