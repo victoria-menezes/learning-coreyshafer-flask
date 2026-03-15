@@ -8,6 +8,8 @@ from flaskblog import db, app, login_manager
 
 from flask_login import UserMixin
 
+from itsdangerous import URLSafeTimedSerializer as Serializer
+
 @login_manager.user_loader
 def load_user(user_id : int):
     return User.query.get(user_id)
@@ -41,6 +43,31 @@ class User(db.Model, UserMixin):
         backref = 'author', # lets us access Post.author to get the user object that is the author 
         lazy = True # sqlalchemy will load the data as necessary in one go
     )
+
+    
+
+    def get_reset_token(
+            self
+    ):
+        s = Serializer(app.config['SECRET_KEY'])
+
+        return s.dumps({'user_id':self.id}).decode('utf-8')
+    
+    @staticmethod # telling python not to expect self as an argument
+    def verify_reset_token(
+            token
+    ):
+        MINUTES_TO_RESET = 30
+
+        expires_sec = 60 * MINUTES_TO_RESET
+
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, max_age = expires_sec)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
+        
 
     def __repr__(self) -> str:
         # how its printed with print()
@@ -77,4 +104,3 @@ class Post(db.Model):
 
 with app.app_context():
     db.create_all()
-    # print('Models initialized', db.Model.__subclasses__())
