@@ -1,7 +1,7 @@
 from flask import Blueprint
 
-from flask import render_template, flash, redirect, url_for, request
-from flaskblog import app, db, bcrypt
+from flask import current_app, render_template, flash, redirect, url_for, request
+from flaskblog import db, bcrypt
 from flaskblog.users.forms import (
     RegistrationForm, LoginForm, UpdateAccountForm,
     RequestResetForm, ResetPasswordForm)
@@ -68,7 +68,7 @@ def login():
         ):
             login_user(user, remember = form.remember.data)
             next_page = request.args.get('next') # saved in the url, for example if you tried to access the account page without being logged in
-            return redirect(next_page) if next_page else redirect(url_for('main.ome'))            
+            return redirect(next_page) if next_page else redirect(url_for('main.home'))            
         else:
             flash('Login failed, please check email and password','danger')
     return render_template(
@@ -95,7 +95,7 @@ def account():
         if form.picture.data:
             # get previous picture for deletion if not default
             if current_user.image_file != 'default.jpg':
-                previous_picture = os.path.join(app.root_path, 'static/profile_pics', current_user.image_file)
+                previous_picture = os.path.join(current_app.root_path, 'static/profile_pics', current_user.image_file)
                 if os.path.exists(previous_picture):
                     os.remove(previous_picture)
 
@@ -107,7 +107,7 @@ def account():
         current_user.email = form.email.data
         db.session.commit()
         flash('Your account has been updated!', 'success')
-        return redirect(url_for('main.account'))
+        return redirect(url_for('users.account'))
     
     elif request.method =='GET':
         # populates the form on page load

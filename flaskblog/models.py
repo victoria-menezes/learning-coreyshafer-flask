@@ -4,7 +4,7 @@
 # instead we turned out application into a package
 
 from datetime import datetime, timezone
-from flaskblog import db, app, login_manager
+from flaskblog import db, login_manager, app
 
 from flask_login import UserMixin
 
