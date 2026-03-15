@@ -4,7 +4,8 @@
 # instead we turned out application into a package
 
 from datetime import datetime, timezone
-from flaskblog import db, login_manager, app
+from flaskblog import db, login_manager #, app
+from flask import current_app as app
 
 from flask_login import UserMixin
 
@@ -102,5 +103,5 @@ class Post(db.Model):
         return f'Post(\'{self.title}\', \'{self.date_posted}\')'
 
 
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()

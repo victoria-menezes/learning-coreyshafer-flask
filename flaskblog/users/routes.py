@@ -1,7 +1,8 @@
 from flask import Blueprint
 
-from flask import current_app, render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request
 from flaskblog import db, bcrypt
+from flask import current_app as app
 from flaskblog.users.forms import (
     RegistrationForm, LoginForm, UpdateAccountForm,
     RequestResetForm, ResetPasswordForm)
@@ -95,7 +96,7 @@ def account():
         if form.picture.data:
             # get previous picture for deletion if not default
             if current_user.image_file != 'default.jpg':
-                previous_picture = os.path.join(current_app.root_path, 'static/profile_pics', current_user.image_file)
+                previous_picture = os.path.join(app.root_path, 'static/profile_pics', current_user.image_file)
                 if os.path.exists(previous_picture):
                     os.remove(previous_picture)
 

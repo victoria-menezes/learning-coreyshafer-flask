@@ -1,4 +1,5 @@
-from flaskblog import app
+# from flaskblog import app
+from flask import current_app as app
 
 import secrets
 import os
