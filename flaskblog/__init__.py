@@ -13,7 +13,7 @@ import os
 # setting up .env
 load_dotenv()
 
-db = SQLAlchemy() # also calls db.init_app(app)
+db = SQLAlchemy()
 # print('Database initialized')
 
 # to add users, etc:
