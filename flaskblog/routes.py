@@ -259,7 +259,7 @@ def update_post(
     
 @app.route(
     '/post/<int:post_id>/delete',
-    methods = ['POST']
+    methods = ['POST'] # method='POST' on the form action or it will tell you this page does not accept this method
 )
 @login_required
 def delete_post(post_id : int):
@@ -267,5 +267,8 @@ def delete_post(post_id : int):
     if post.author != current_user:
         abort(403)
     
-    return render_template(
-    )
+    db.session.delete(post)
+    db.session.commit()
+
+    flash('Post deleted.', 'success')
+    return redirect(url_for('home'))
